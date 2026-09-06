@@ -1,32 +1,40 @@
-# Health-Connect-Appointment-Attendance# HealthConnect Appointment No-Show Prediction — Week 4
+# HealthConnect-Appointment-Attendance
+
+# HealthConnect Appointment No-Show Prediction — Week 5
 
 ## Project Overview
 
-This project is part of the AnalystLab Africa Week 4 Experience Lab.
+This project is part of the **AnalystLab Africa Week 5 Experience Lab** on the **Data Science Track**.
 
-The Data Science work focuses on defining a machine learning solution for predicting whether a scheduled HealthConnect appointment is likely to result in a patient no-show.
+The Week 5 Data Science work is building directly on the machine-learning problem defined in Week 4 and moving the project from **problem definition into practical baseline modelling**.
 
-The proposed solution is a supervised binary classification approach that distinguishes between:
+The project is focusing on predicting whether a scheduled HealthConnect appointment is likely to result in a **patient No-Show**, using information that can reasonably be available before the appointment outcome is known.
 
-* **No-Show**
-* **Attended**
+The solution is being treated as a **supervised binary classification problem** distinguishing between:
 
-Week 4 focuses on problem understanding, resource review, initial data assessment, target and feature definition, and the development of an initial modelling approach. A complete machine learning model is not developed at this stage.
+- **No-Show**
+- **Attended**
+
+Week 5 covers data preparation, evidence-based quality assessment, exploratory analysis, feature engineering, patient-aware train/test separation, baseline model development, model evaluation, interpretation, modelling risks, and recommendations for further improvement.
 
 ---
 
 ## Project Objectives
 
-The main objectives of the Week 4 Data Science work are to:
+The Week 5 Data Science objectives are to:
 
-* Review the appointment dataset and relevant variables.
-* Assess the quality and suitability of the data.
-* Define the machine learning problem.
-* Identify the proposed target variable.
-* Identify potential input features.
-* Define how cancelled appointments will be handled.
-* Develop an initial modelling approach.
-* Identify key assumptions, limitations, risks, and dependencies.
+- Implement the machine-learning decisions established in Week 4.
+- Prepare the binary modelling population.
+- Assess and treat data-quality issues using evidence from the dataset.
+- Examine relationships among relevant variables.
+- Examine relationships between predictors and the no-show target.
+- Engineer useful pre-appointment features.
+- Prevent potential target leakage.
+- Account for repeated patients during model evaluation.
+- Develop a Logistic Regression baseline model.
+- Evaluate the baseline using appropriate classification metrics.
+- Interpret model outputs from both a technical and HealthConnect decision perspective.
+- Document assumptions, limitations, risks, dependencies, and future improvements.
 
 ---
 
@@ -34,206 +42,192 @@ The main objectives of the Week 4 Data Science work are to:
 
 The following resources were used:
 
-* `HealthConnect_Appointment_Data.csv`
-* `HealthConnect_Data_Dictionary.xlsx`
+- `HealthConnect_Appointment_Data.csv`
+- `HealthConnect_Data_Dictionary.xlsx`
 
-The appointment dataset contains 5,000 records and 18 variables covering:
+The original dataset contains **5,000 appointment records and 18 variables** covering:
 
-* Patient demographics
-* Appointment information
-* Booking details
-* Previous appointment history
-* Previous no-shows
-* Reminder information
-* Distance to the clinic
-* Waiting time
-* Appointment outcomes
+- Patient demographics
+- Appointment information
+- Booking information
+- Previous appointment behaviour
+- Previous no-shows
+- Reminder information
+- Distance to clinic
+- Waiting time
+- Appointment outcomes
 
----
-
-## Key Week 4 Findings
-
-The initial assessment found that:
-
-* The dataset contains 5,000 appointment records and 18 variables.
-* The dataset includes relevant demographic, appointment, historical, reminder, distance, and outcome information.
-* No fully duplicated records were identified.
-* Some patients have multiple appointment records, representing repeated appointments rather than automatically duplicated data.
-* `reminder_channel` contains missing values that are structurally related to appointments where no reminder was sent.
-* `distance_to_clinic_km` and `waiting_time_minutes` contain limited missing values.
-* Key relationships between appointment history and date-related variables were found to be internally consistent.
-* `appointment_outcome` contains three outcomes: `Attended`, `No-Show`, and `Cancelled`.
-* The proposed prediction target is a binary no-show indicator.
-* `Cancelled` appointments should be excluded from the binary modelling dataset.
-* Potential features must be available before the appointment outcome is known.
-* `waiting_time_minutes` was excluded because it may introduce data leakage.
-* Repeated patient records should be considered when developing the future train-test splitting strategy.
+The original dataset is being preserved while transformations are being performed on working copies.
 
 ---
 
-## Machine Learning Problem
+# Week 4 → Week 5 Transition
 
-The proposed machine learning problem is:
+Week 4 established the machine-learning problem as a supervised binary classification task.
 
-> **To develop a machine learning solution that predicts whether a scheduled appointment is likely to result in a patient no-show using information available before the appointment takes place.**
+The Week 4 target definition was:
 
-This is a **supervised binary classification problem**.
+| Appointment Outcome | Binary Target |
+|---|---:|
+| No-Show | 1 |
+| Attended | 0 |
+| Cancelled | Excluded |
 
-The unit of prediction is **one scheduled appointment**.
+Week 5 is implementing this decision rather than leaving it as a proposed modelling approach.
 
----
+The complete dataset initially contained:
 
-## Proposed Target Variable
+- **5,000** appointment records
+- **2,423 No-Shows**
+- **2,314 Attended**
+- **263 Cancelled**
 
-The target will be derived from `appointment_outcome`.
+The 263 cancelled appointments were excluded from the binary modelling population, resulting in:
 
-| Appointment Outcome |                                     Target |
-| ------------------- | -----------------------------------------: |
-| No-Show             |                                          1 |
-| Attended            |                                          0 |
-| Cancelled           | Excluded from the binary modelling dataset |
+- **4,737 modelling records**
+- **2,423 No-Shows**
+- **2,314 Attended**
 
-The binary target will represent:
+The resulting No-Show rate within the modelling population was **51.15%**.
 
-* **1 = No-Show**
-* **0 = Attended**
-
----
-
-## Potential Input Features
-
-The initial potential feature set includes:
-
-* `gender`
-* `age`
-* `appointment_type`
-* `appointment_day`
-* `appointment_time`
-* `booking_lead_days`
-* `previous_appointments`
-* `previous_no_shows`
-* `reminder_sent`
-* `reminder_channel`
-* `distance_to_clinic_km`
-
-### Variables Requiring Further Consideration
-
-* `booking_date`
-* `appointment_date`
-
-These date variables may require transformation into model-relevant features.
-
-### Variables Initially Excluded
-
-* `appointment_id` — Unique appointment identifier.
-* `patient_id` — Patient identifier; retained only for possible patient-aware data splitting.
-* `age_group` — Derived from `age`.
-* `appointment_outcome` — Source of the target variable.
-* `waiting_time_minutes` — Excluded due to potential data leakage.
+This produced a relatively balanced binary target, meaning that the modelling task does not begin with severe class imbalance.
 
 ---
 
-## Proposed Modelling Approach
+# Week 5 Data Preparation
 
-The proposed approach is to:
+## Missing Values
 
-1. Prepare a binary modelling dataset containing only Attended and No-Show appointments.
-2. Create a binary no-show target.
-3. Select appropriate input features.
-4. Prepare and transform the data for modelling.
-5. Handle missing values.
-6. Encode categorical variables.
-7. Use a suitable train-test splitting strategy that considers repeated patient records.
-8. Train Logistic Regression as an initial baseline model.
-9. Evaluate performance using appropriate classification metrics.
-10. Compare additional models during later development if necessary.
+Missing-value assessment identified:
 
-### Initial Evaluation Metrics
+| Variable | Missing Records | Missing % |
+|---|---:|---:|
+| `reminder_channel` | 1,285 | 27.13% |
+| `distance_to_clinic_km` | 86 | 1.82% |
+| `waiting_time_minutes` | 58 | 1.22% |
 
-The future model will be assessed using:
+The missing values were treated according to the nature of each variable.
 
-* Accuracy
-* Precision
-* Recall
-* F1-score
-* ROC-AUC, where appropriate
-* Confusion Matrix
+`reminder_channel` was treated as a categorical variable and missing observations were represented as **`Not Recorded`** rather than deleting the affected appointments.
+
+The numerical variables `distance_to_clinic_km` and `waiting_time_minutes` were treated using median-based replacement where appropriate during preparation.
+
+The treatment was designed to preserve the eligible appointment population while ensuring that the modelling data could be processed reliably.
 
 ---
 
-## Assumptions
+## Duplicate Records
 
-The proposed approach assumes that:
+Duplicate records were checked as part of the Week 5 preparation process.
 
-* Each record represents a valid scheduled appointment.
-* `appointment_outcome` accurately reflects the final appointment status.
-* `previous_appointments` and `previous_no_shows` represent information available before the current appointment.
-* Selected features will be available when a prediction is made.
-* Multiple records for the same patient represent legitimate different appointments.
+The analysis distinguished between:
 
----
+- complete duplicate records; and
+- legitimate repeated appointments belonging to the same patient.
 
-## Limitations and Risks
+Repeated patient records were **not automatically removed**, because a patient having multiple appointments does not mean those appointments are duplicates.
 
-Key considerations include:
-
-* Missing values in some variables.
-* Potential data leakage from information unavailable at prediction time.
-* Repeated patient records affecting model evaluation if not handled appropriately.
-* Target definition and the treatment of cancelled appointments.
-* Feature redundancy from derived or closely related variables.
-* Limited information beyond the variables available in the dataset.
-* The fictional and anonymized nature of the dataset.
-* The risk of relying on a single model evaluation metric.
+This distinction became particularly important for the train/test strategy.
 
 ---
 
-## Dependencies
+# Feature Engineering
 
-Future model development depends on:
+Week 5 moved beyond the original Week 4 feature list by developing additional pre-appointment features where they could provide useful modelling information.
 
-* Availability of the appointment dataset and Data Dictionary.
-* A confirmed target and cancellation-handling strategy.
-* Appropriate data preparation and feature engineering.
-* A suitable patient-aware data-splitting strategy.
-* Required Python data science and machine learning libraries.
-* Availability of selected features at the time predictions are made.
+Feature engineering included behavioural and calendar-related information.
 
----
+A particularly important engineered behavioural measure was:
 
-## Proposed Focus for Week 5
+- `prior_no_show_rate`
 
-The proposed Week 5 focus is to begin the model development stage by:
+This was developed to represent a patient's historical no-show behaviour rather than relying only on the raw number of previous no-shows.
 
-* Preparing the binary modelling dataset.
-* Finalizing the target variable.
-* Preparing and selecting model features.
-* Handling missing values.
-* Transforming and encoding required variables.
-* Selecting an appropriate data-splitting strategy.
-* Beginning initial model development and evaluation.
+Calendar and appointment-related transformations were also considered where they provided information available before the appointment.
 
 ---
 
-## Repository Structure
+# Data Leakage Prevention
+
+Potential data leakage was treated as a major modelling consideration.
+
+`waiting_time_minutes` was excluded from the predictive feature set because it may not be reliably available before the appointment takes place.
+
+This decision was made even though the variable could potentially contain predictive information.
+
+The priority was to ensure that the model learns from information that could genuinely be available when HealthConnect needs to make a pre-appointment prediction.
+
+This makes the baseline more credible for future operational use.
+
+---
+
+# Major Exploratory Analysis Findings
+
+The Week 5 analysis examined relationships among numerical variables, categorical variables, appointment characteristics, historical behaviour, reminders, accessibility variables, calendar timing, and the no-show target.
+
+## 1. No-show behaviour is multifactorial
+
+The analysis indicates that no-show behaviour should not be explained using a single patient characteristic.
+
+Useful predictive signals are coming from a combination of:
+
+- Previous attendance behaviour
+- Previous no-shows
+- Prior no-show rate
+- Booking lead time
+- Reminder exposure and channel
+- Appointment context
+- Distance/accessibility
+- Calendar timing
+
+This supports a modelling approach that combines multiple characteristics rather than relying on simplistic rules.
+
+## 2. Historical behaviour is important
+
+Previous appointment behaviour provides useful information about future appointment adherence.
+
+Variables such as `previous_no_shows` and the engineered `prior_no_show_rate` were therefore retained as important predictive candidates.
+
+**HealthConnect implication:** historical attendance behaviour can support more targeted reminder prioritisation rather than treating every appointment in exactly the same way.
+
+## 3. Booking lead time provides a useful signal
+
+The Week 5 analysis found higher average booking lead time among no-show appointments.
+
+This suggests that appointments scheduled further in advance may require additional confirmation closer to the appointment date.
+
+**HealthConnect implication:** long-lead appointments could potentially be prioritised for stronger confirmation workflows.
+
+## 4. Reminder variables contain useful information
+
+`reminder_sent` and `reminder_channel` showed observable differences in no-show behaviour and were retained because they represent information available before the appointment outcome.
+
+However, the analysis does **not** establish that reminders themselves cause patients to attend.
+
+Reminder variables may partly reflect existing clinic processes and patient characteristics.
+
+**HealthConnect implication:** the eventual model could help prioritise reminder and support actions, while operational testing would still be required to establish intervention effectiveness.
+
+## 5. Appointment context and accessibility contribute additional information
+
+Appointment characteristics, calendar timing and accessibility-related variables provide additional predictive information when considered alongside behavioural and booking variables.
+
+The analysis therefore supports a broader view of attendance behaviour rather than attributing no-shows to one demographic characteristic.
+
+---
+
+# Machine Learning Development
+
+## Modelling Population
+
+The modelling dataset contains:
+
+- **4,737 appointments**
+- **2,423 No-Shows**
+- **2,314 Attended**
+
+The target variable is:
 
 ```text
-HealthConnect-Appointment-No-Show-Prediction/
-│
-├── data/
-│   ├── HealthConnect_Appointment_Data.csv
-│   └── HealthConnect_Data_Dictionary.xlsx
-│
-├── notebooks/
-│   └── HealthConnect_DataScience_Week4_Problem_Definition.ipynb
-│
-├── README.md
-└── requirements.txt
-```
-
----
-
-## Author
-
-**Suleiman Habeebullahi**
-Data Scientist
+no_show = 1 → No-Show
+no_show = 0 → Attended
