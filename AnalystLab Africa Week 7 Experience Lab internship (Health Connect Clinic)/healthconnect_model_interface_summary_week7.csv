@@ -1,0 +1,6 @@
+field,value
+numeric_features,"age, previous_appointments, prev_no_show_rate, booking_lead_days, distance_to_clinic_km, previous_no_shows"
+binary_features,"high_prev_no_show, long_distance, no_reminder"
+categorical_features,"gender, appointment_type, appointment_day, appointment_time, reminder_sent, reminder_channel, lead_time_band"
+target_variable,"no_show (1 = No-Show, 0 = Attended)"
+output_format,"predict_proba()[:, 1] for a calibrated probability; predict() for a 0/1 label at the chosen threshold"
