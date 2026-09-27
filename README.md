@@ -4,7 +4,7 @@
 
 HealthConnect is a healthcare data science project focused on predicting whether a scheduled appointment will result in a **No-Show or Attendance**.
 
-The project began in **Week 4** with the definition of a supervised binary classification problem and progressed through data preparation, feature engineering, patient-aware validation, baseline modelling, model improvement, and systematic testing and refinement.
+The project progressed from problem definition and baseline modelling to model improvement, validation, refinement, calibration, and final integration.
 
 The dataset is synthetic and contains **5,000 appointment records**:
 
@@ -18,7 +18,7 @@ Cancelled appointments were excluded from binary modelling, leaving **4,737 mode
 
 ## Week 4 — Problem Definition
 
-The modelling problem was defined as **supervised binary classification**:
+The problem was defined as **supervised binary classification**:
 
 | Appointment Outcome |   Target |
 | ------------------- | -------: |
@@ -26,7 +26,7 @@ The modelling problem was defined as **supervised binary classification**:
 | Attended            |        0 |
 | Cancelled           | Excluded |
 
-The objective is to predict no-show risk using information reasonably available before the appointment outcome is known.
+The objective was to predict no-show risk using information available before the appointment outcome.
 
 ---
 
@@ -34,14 +34,13 @@ The objective is to predict no-show risk using information reasonably available 
 
 Week 5 focused on:
 
-* Data-quality assessment and preparation
+* Data preparation and quality assessment
 * Exploratory data analysis
 * Feature engineering
 * Leakage prevention
 * Patient-aware train/test separation
-* Logistic Regression baseline development
+* Logistic Regression baseline
 * Model evaluation using Accuracy, Precision, Recall, F1-score and ROC-AUC
-* Error and coefficient interpretation
 
 Important predictive signals included **booking lead time, previous no-show behaviour, reminder information, appointment context and distance**.
 
@@ -51,16 +50,16 @@ Important predictive signals included **booking lead time, previous no-show beha
 
 ## Week 6 — Model Improvement & Validation
 
-Week 6 extended the baseline through:
+Week 6 focused on:
 
-* Error analysis using TP, TN, FP and FN
-* Segment-level error investigation
+* Error analysis
+* Segment-level validation
 * Feature refinement
 * Patient-grouped cross-validation using `GroupKFold`
 * Comparison of Decision Tree, Random Forest and Gradient Boosting
-* Testing a lead-time × previous no-show rate interaction
-* Integration of findings from the Data Analytics track
-* Cumulative-gains analysis from a practical outreach perspective
+* Testing additional feature interactions
+* Cross-track validation with Data Analytics
+* Cumulative-gains analysis
 
 ### Model Results
 
@@ -71,60 +70,76 @@ Week 6 extended the baseline through:
 | **Random Forest**   |    **0.683** |     0.625 |     0.630 |
 | Gradient Boosting   |        0.678 | **0.650** | **0.641** |
 
-### Model Decision
-
-**Random Forest** was selected as the primary candidate because it achieved the highest cross-validated ROC-AUC (**0.673**) and test ROC-AUC (**0.683**).
-
-**Gradient Boosting** remained a strong alternative because it achieved the highest Recall (**0.650**) and F1-score (**0.641**).
-
-Overall, model improvement was **modest**, making further testing and refinement important.
+Random Forest was selected as the primary candidate based on its cross-validated and test ROC-AUC performance.
 
 ---
 
-## Key Findings
+## Week 7 — Model Testing, Refinement & Validation
 
-* Lead time and previous no-show behaviour remain important predictive signals.
-* Random Forest provided the best overall discrimination, but only a modest improvement over Logistic Regression.
-* Gradient Boosting provided higher Recall and F1-score.
-* Error analysis identified segments where the model makes more mistakes.
-* Cumulative-gains analysis showed that both the baseline and Random Forest can improve on random targeting.
-* The lead-time × previous no-show interaction did not improve Random Forest cross-validation performance and was not adopted.
+Week 7 focused on systematically testing and refining the Random Forest model.
+
+Key outcomes:
+
+* Random Forest outperformed the baseline in **5 out of 5 independent splits**.
+* An overfitting issue was identified and addressed.
+* `max_depth` was reduced from **8 to 5**, reducing the train-test ROC-AUC gap from **0.073 to 0.026**.
+* Isotonic calibration improved probability reliability.
+* Bootstrap testing produced a 95% confidence interval for ROC-AUC improvement of **[0.0036, 0.0295]**.
+* Specialist Consultation and the **65+ age group** were identified as weaker-performing segments.
+* Additional Data Analytics findings were validated and tested as potential model features.
+* Cost-sensitive threshold analysis showed that a final operational threshold requires real HealthConnect cost information.
+
+The refined Random Forest with isotonic calibration was carried forward to Week 8.
 
 ---
 
-# Week 7 — Model Testing, Refinement & End-to-End Validation
+# Week 8 — Final Integration & Presentation
 
-Week 7 focused on systematically testing the Week 6 Random Forest candidate beyond a single train/test split.
+Week 8 focused on **finalising, documenting and presenting the tested model**.
 
-Key activities included:
+Key outcomes:
 
-* **Stability testing:** Random Forest outperformed the baseline in **5 out of 5 independent train/test splits**, confirming that its advantage was not specific to one split.
-* **Segment validation:** Performance was generally consistent, but **Specialist Consultation** and the **65+ age group** showed weaker performance and were documented as limitations.
-* **Overfitting testing:** An initial train-test ROC-AUC gap of **0.073** was identified. Reducing model complexity narrowed the gap to **0.026** and improved test ROC-AUC to approximately **0.689**.
-* **Probability calibration:** Isotonic calibration improved the model's probability reliability, reducing the Brier score by approximately **0.82%**, particularly improving calibration at the higher-risk end.
-* **Statistical validation:** Bootstrap testing produced a positive ROC-AUC improvement with a 95% confidence interval that excluded zero, providing evidence that the improvement over the baseline was statistically meaningful.
-* **Cross-track validation:** Six Data Analytics findings were independently validated. A resulting high-risk combination showed an **83.3% No-Show rate**, but adding it as a model feature did not improve cross-validated performance, so it was not adopted.
-* **Threshold analysis:** Cost-sensitive threshold testing showed that the optimal threshold is highly dependent on real HealthConnect cost information, which was not available.
+* Confirmed the **depth-refined Random Forest with isotonic probability calibration** as the final candidate.
+* Final model achieved **0.689 test ROC-AUC** and **0.643 test accuracy**.
+* Baseline Logistic Regression achieved **0.671 test ROC-AUC** and **0.616 test accuracy**.
+* Confirmed the model's suitability for **risk ranking and outreach prioritisation**.
+* Validated Data Analytics findings and tested additional features without automatically adopting them.
+* Documented the final model requirements for Machine Learning Engineering.
+* Saved the final model and model interface specification.
+* Documented the model's limitations, risks and outstanding integration requirements.
 
-### Final Week 7 Model
+### Final Model
 
-The final candidate carried forward is a **depth-refined Random Forest with isotonic probability calibration**.
+**Random Forest + Isotonic Probability Calibration**
 
-The model is considered suitable for **risk ranking and prioritisation**, but not for fully automated scheduling decisions at this stage.
+The model is intended to help HealthConnect **prioritise appointments by predicted no-show risk**, rather than make fully automated scheduling decisions.
 
-### Week 7 Limitations
+### Final Artefacts
 
-* Specialist Consultation and 65+ remain weaker-performing segments.
-* The operational classification threshold requires real business cost information.
-* The dataset is synthetic and therefore does not establish real-world clinical performance.
-* Machine Learning Engineering integration remains an outstanding cross-track dependency.
+```text
+healthconnect_random_forest_model_week8_final.joblib
+healthconnect_model_interface_spec_week8_final.csv
+```
+
+---
+
+## Key Limitations
+
+* The dataset is synthetic and does not establish real-world clinical performance.
+* Overall predictive performance remains moderate.
+* Specialist Consultation and patients aged 65+ remain weaker-performing segments.
+* A production classification threshold requires real operational cost information.
+* Machine Learning Engineering integration remains outstanding.
 
 ---
 
 ## Project Status
 
-**Week 4:** Problem definition completed
-**Week 5:** Baseline modelling completed
-**Week 6:** Model improvement and validation completed
-**Week 7:** Testing, refinement, calibration and end-to-end validation completed
-**Week 8:** Final integration and presentation
+| Week                       | Status    | Main Outcome                                      |
+| -------------------------- | --------- | ------------------------------------------------- |
+| **Week 4**                 | Completed | Problem definition                                |
+| **Week 5**                 | Completed | Baseline Logistic Regression                      |
+| **Week 6**                 | Completed | Model comparison and Random Forest selection      |
+| **Week 7**                 | Completed | Testing, refinement and calibration               |
+| **Week 8**                 | Completed | Final model integration and presentation          |
+| **Production Integration** | Pending   | ML pipeline integration and operational threshold |
